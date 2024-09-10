@@ -13,6 +13,6 @@ int main()
 
     slope = (y2 - y1) / (x2 - x1);
 
-    printf("Slope = %f", slope);
+    printf("Slope = %0.3f", slope);
     return 0;
 }
