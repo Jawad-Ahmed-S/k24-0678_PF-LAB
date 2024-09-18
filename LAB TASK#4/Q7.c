@@ -4,12 +4,12 @@ int main()
 {
     int CustomerID, UnitConsumed;
     char name[10];
-    float price, totalPrice, surcharge = 0;
+    float price, totalPrice=0, surcharge = 0;
     printf("Enter you Customer Id :");
     scanf("%d", &CustomerID);
 
     printf("Enter you name :");
-    scanf("%s", &name);
+    scanf("%s", name);
     printf("Enter you Unit Consumed :");
     scanf("%d", &UnitConsumed);
     if (UnitConsumed > 199)
@@ -41,7 +41,7 @@ int main()
     }
 
     printf("Customer Id: %d \n", CustomerID);
-    printf("Customer Name : %c \n", name);
+    printf("Customer Name : %s \n", name);
     printf("Units Consumed : %d \n", UnitConsumed);
     printf("Amount Charges @%0.2f per unit : %0.2f\n", price, totalPrice);
     printf("Surcharge Amount : %0.2f \n", surcharge);
