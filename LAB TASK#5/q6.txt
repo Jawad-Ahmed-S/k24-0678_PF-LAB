@@ -1,0 +1,7 @@
+Because of the order of precedence.
+5<8   which is true so(1 != 2 < 5 ? 20 : 30) will be executed.
+now, first of all 2<5 will be executes and then returns a 1   
+Then, 1!=1 is false so 
+
+Results:
+30
