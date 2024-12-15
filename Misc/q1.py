@@ -14,4 +14,4 @@ else:
     Ceq=None
 
 if Ceq is not None:
-    print("Ceq = {Ceq}F")
+    print(f"Ceq = {Ceq}F")
