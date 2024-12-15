@@ -8,4 +8,4 @@ bz=int(input("Enter Bz : "))
 
 DotProduct = (ax*bx)+(ay*by)+(az*bz)
 
-print("Dot Product: {DotProduct}")
+print(f"Dot Product: {DotProduct}")
