@@ -93,18 +93,18 @@ public:
 };
 int main()
 {
-    StationaryShop Inventory("Pencil", 35);
-    Inventory.DisplayInventory();
+    StationaryShop S1("Pencil", 35);
+    S1.DisplayInventory();
     cout << "\n\n New Inventory" << endl;
-    Inventory.AddItems("Marker", 100);
-    Inventory.AddItems("Pen", 200);
-    Inventory.AddItems("Eraser", 300);
-    Inventory.DisplayInventory();
-    Inventory.RemoveProduct("Pen");
-    Inventory.UpdatePrices("Pencil", 1000);
-    Inventory.DisplayInventory();
+    S1.AddItems("Marker", 100);
+    S1.AddItems("Pen", 200);
+    S1.AddItems("Eraser", 300);
+    S1.DisplayInventory();
+    S1.RemoveProduct("Pen");
+    S1.UpdatePrices("Pencil", 1000);
+    S1.DisplayInventory();
     string bought[] = {"Marker", "Pencil"};
     int quant[] = {2, 3};
-    Inventory.GenerateReceipt(bought, quant, 2);
+    S1.GenerateReceipt(bought, quant, 2);
     return 0;
 }
