@@ -23,7 +23,7 @@ class Account{
         }
     }
     void WithDraw(double amount){
-        if(amount<Balance){
+        if(amount>Balance){
             cout<<"\nInsufficient Balance!"<<endl;
             return;
         }
@@ -32,14 +32,12 @@ class Account{
         }
     }
     void checkBalance(){
-        cout<<"\n\nAccount Holder Name : "<<this->AccountHolderName<<endl;
-        cout<<"Account Number : "<<this->AccountNumber<<endl;
         cout<<"Current Balance : "<<this->Balance<<endl;
     }
 };
 int main(){
 
-Account A1("456","Jawad",554364.054),A2("453","Ibrahim",2342054.3),A3("978","Ahmed",64545.65456);
+Account A1("456","Jawad",554364.054),A2("453","Ibrahim",22054.3),A3("978","Ahmed",645.65456);
 A1.checkBalance();
 A1.WithDraw(3243.34);
 A1.checkBalance();
