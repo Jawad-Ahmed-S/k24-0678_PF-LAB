@@ -19,20 +19,7 @@ public:
              << endl;
     }
 };
-void writeString(fstream &out, const string &str) {
-    size_t len = str.length();
-    out.write(reinterpret_cast<const char*>(&len), sizeof(len));     // Write string length
-    out.write(str.c_str(), len);                                     // Write string content
-}
-void readString(fstream &in, string &str) {
-    size_t len;
-    in.read(reinterpret_cast<char*>(&len), sizeof(len));             // Read string length
-    char *buffer = new char[len + 1];
-    in.read(buffer, len);                                            // Read string content
-    buffer[len] = '\0';
-    str = buffer;
-    delete[] buffer;
-}
+
 int getValidInt()
 {
     int value;
@@ -87,24 +74,12 @@ public:
         CardActiveMonths = monthsPaid;
     }
     virtual void printDetails()=0;
-    virtual void writeDataToFile(fstream &out){
-        out.write(reinterpret_cast<const char *>(&CustomerId),sizeof(CustomerId));
-        writeString(out,Name);
-        out.write(reinterpret_cast<const char *>(&ispaid),sizeof(ispaid));    
-        out.write(reinterpret_cast<const char *>(&pickup),sizeof(pickup));    
-        out.write(reinterpret_cast<const char *>(&drop),sizeof(drop));    
-        out.write(reinterpret_cast<const char *>(&CardActiveMonths),sizeof(CardActiveMonths));   
-        // AssignedBus->writeDataFromFile(out); 
+    virtual void saveDataToFile(){
+        ofstream outFile;
+        outFile.open("Customers.bin", ios::app);
+        outFile << CustomerId << " " << Name << " " << ispaid << " " << pickup << " " << drop << " " << CardActiveMonths << endl;
+        outFile.close();
     } 
-    virtual void readDataFromFile(fstream &in){
-        in.read(reinterpret_cast<char *>(&CustomerId),sizeof(CustomerId));
-        readString(in,Name);
-        in.read(reinterpret_cast<char *>(&ispaid),sizeof(ispaid));
-        readString(in,pickup);
-        readString(in,drop);
-        in.read(reinterpret_cast<char *>(&CardActiveMonths),sizeof(CardActiveMonths));
-        // AssignedBus->readDataFromFile(in);
-    }
     int getCustomerId()
     {
         return CustomerId;
@@ -188,7 +163,8 @@ public:
              << CardActiveMonths << endl;
     }
 };
-class Bus{
+class Bus
+{
     int BusId;
     int capacity;
     string *stops;
@@ -234,24 +210,7 @@ public:
             stops[i] = other.stops[i];
         }
     }
-    void writeDataFromFile(fstream& out){
-    out << BusId << '\n'
-        << capacity << '\n'
-        << NoCustomerAssigned << '\n'
-        << noStops << '\n';
-    for (int i = 0; i < noStops; ++i) {
-        out << stops[i] << '\n';
-    }
-}
-    void readDataFromFile(fstream& in){
-        in >> BusId >> capacity >> NoCustomerAssigned >> noStops;
-    in.ignore();
-    delete[] stops;
-    stops = new string[noStops];
-    for (int i = 0; i < noStops; ++i) {
-        getline(in, stops[i]);
-    }
-    }
+
     // Bus &operator=(const Bus &other)
     // {
     //     cout << "Assignment operator called for Bus: " << other.BusId << endl;
@@ -462,36 +421,6 @@ public:
             bus[i]->printStops();
         }
     }
-    void saveAllBusses(){
-        fstream file("bus.txt",ios::out);
-        if (!file.is_open())
-        {
-            cout << "Error opening file for writing." << endl;
-            return;
-        }
-        for (int i = 0; i < 1; i++){
-            bus[i]->writeDataFromFile(file);
-        }
-        file.close();
-    }
-    void readAllBusses(){
-        fstream file("bus.txt",ios::in);
-        
-        if (!file.is_open())
-        {
-            cout << "Error opening file for reading." << endl;
-            return;
-        }
-            bus[0]->readDataFromFile(file);
-        
-        cout<<"BusId: "<<bus[0]->getBusId()<<endl;
-        cout<<"Capacity: "<<bus[0]->getCapacity()<<endl;
-        cout<<"No of Customers: "<<bus[0]->getNoCustomersAssigned()<<endl;
-        cout<<"Stops: ";
-        bus[0]->printStops();
-        cout<<endl;
-        file.close();
-    }
     void addCustomer(string name, bool paid, string pickup, string drop, string Type)
     {
         Customer **temp = new Customer *[noCustomers + 1]; // ✅ Allocate array of pointers
@@ -514,8 +443,8 @@ public:
         customer = temp;
         noCustomers++;
     }
-    
-    void addBus(int id, int cap, string* stop, int noStops)
+
+void addBus(int id, int cap, string* stop, int noStops)
 {
     Bus** temp = new Bus*[noBuses + 1];
     
@@ -534,7 +463,6 @@ public:
     
     bus = temp;
     noBuses++;
-    // bus[noBuses]->writeDataFromFile();
 }
 
 
@@ -571,9 +499,8 @@ int main()
         cout << "3. Assign Bus" << endl;
         cout << "4. All Customers" << endl;
         cout << "5. All Buses" << endl;
-        cout << "6. Write all Busses" << endl;
-        cout << "7. Read all Busses" << endl;
-        cout << "8. Exit" << endl;
+        cout << "6. Pay Fee" << endl;
+        cout << "7. Exit" << endl;
         choice = getValidInt();
 
         switch (choice)
@@ -641,13 +568,6 @@ int main()
             ts.printAllBuses();
             break;
         case 6:
-            ts.saveAllBusses();
-            break;
-        case 7:
-            ts.readAllBusses();
-            break;
-        case 8:
-
             return 0;
 
         default:
