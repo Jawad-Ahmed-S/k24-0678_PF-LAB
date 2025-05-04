@@ -88,22 +88,22 @@ public:
     }
     virtual void printDetails()=0;
     virtual void writeDataToFile(fstream &out){
-        out.write(reinterpret_cast<const char *>(&CustomerId),sizeof(CustomerId));
-        writeString(out,Name);
-        out.write(reinterpret_cast<const char *>(&ispaid),sizeof(ispaid));    
-        out.write(reinterpret_cast<const char *>(&pickup),sizeof(pickup));    
-        out.write(reinterpret_cast<const char *>(&drop),sizeof(drop));    
-        out.write(reinterpret_cast<const char *>(&CardActiveMonths),sizeof(CardActiveMonths));   
-        // AssignedBus->writeDataFromFile(out); 
+       out<<CustomerId<<'\n'
+       <<Name<<'\n'
+       <<ispaid<<'\n'
+       <<pickup<<'\n'
+       <<drop<<'\n'
+       <<CardActiveMonths<<'\n';
+       // AssignedBus->writeDataFromFile(out); 
     } 
     virtual void readDataFromFile(fstream &in){
-        in.read(reinterpret_cast<char *>(&CustomerId),sizeof(CustomerId));
-        readString(in,Name);
-        in.read(reinterpret_cast<char *>(&ispaid),sizeof(ispaid));
-        readString(in,pickup);
-        readString(in,drop);
-        in.read(reinterpret_cast<char *>(&CardActiveMonths),sizeof(CardActiveMonths));
-        // AssignedBus->readDataFromFile(in);
+        in>>CustomerId;
+        in>>Name;
+        in>>ispaid;
+        in>>pickup;
+        in>>drop;
+        in>>CardActiveMonths;
+        //in->readDataFromFile(in);
     }
     int getCustomerId()
     {
@@ -151,6 +151,7 @@ class Student : public Customer
 {
 public:
     Student(int id, string name, bool ispaid, string pickup, string drop) : Customer(id, name, ispaid, pickup, drop, 6) {}
+    Student(){};
     void setIsPaid(bool paid) override
     {
         ispaid = paid;
@@ -172,9 +173,11 @@ class Teacher : public Customer
 {
 public:
     Teacher(int id, string name, bool ispaid, string pickup, string drop) : Customer(id, name, ispaid, pickup, drop, 1) {}
+    Teacher(){};
     void setIsPaid(bool paid) override
     {
         ispaid = paid;
+        if(paid = true)
         CardActiveMonths = 1;
     }
     void printDetails() override
@@ -213,10 +216,7 @@ public:
     {
         BusId = 0;
         capacity = 0;
-        for (int i = 0; i < noStops; i++)
-        {
-            stops[i] = nullptr;
-        }
+            stops = nullptr;
         NoCustomerAssigned = 0;
         noStops = 0;
     }
@@ -244,7 +244,16 @@ public:
     }
 }
     void readDataFromFile(fstream& in){
-        in >> BusId >> capacity >> NoCustomerAssigned >> noStops;
+
+        cout<<"\nIn function read bus";
+        if(in.eof()){
+            cout<<"EOF reached";
+            return;
+        }
+        in >> BusId;
+        in >> capacity;
+        in >> NoCustomerAssigned;
+        in >> noStops;
     in.ignore();
     delete[] stops;
     stops = new string[noStops];
@@ -252,25 +261,6 @@ public:
         getline(in, stops[i]);
     }
     }
-    // Bus &operator=(const Bus &other)
-    // {
-    //     cout << "Assignment operator called for Bus: " << other.BusId << endl;
-    //     if (this != &other)
-    //     {
-    //         delete[] stops;
-    //         BusId = other.BusId;
-    //         capacity = other.capacity;
-    //         noStops = other.noStops;
-    //         NoCustomerAssigned = other.NoCustomerAssigned;
-    //         stops = new string[noStops];
-
-    //         for (int i = 0; i < noStops; i++)
-    //         {
-    //             stops[i] = other.stops[i];
-    //         }
-    //     }
-    //     return *this;
-    // }
 
     ~Bus()
     {
@@ -407,7 +397,9 @@ class TransportSystem
     Bus **bus;
     int noCustomers;
     int noBuses;
-
+    int noStudents;
+    int noTeachers;
+    // Bus b;
 public:
     Customer **getCustomer()
     {
@@ -432,6 +424,18 @@ public:
         noBuses = 0;
         customer = nullptr;
         bus = nullptr;
+        noStudents=0;
+        noTeachers=0;
+    }
+    void loadSystem(){
+        fstream TS("system.txt",ios::in);
+        TS>>noBuses>>noCustomers>>noStudents>>noTeachers;
+        TS.close();
+    }
+    void saveSystem(){
+        fstream TS("system.txt",ios::out);
+        TS<<noBuses<<'\n'<<noCustomers<<'\n'<<noStudents<<'\n'<<noTeachers;
+        TS.close();
     }
     void printAllCustomers()
     {
@@ -469,48 +473,107 @@ public:
             cout << "Error opening file for writing." << endl;
             return;
         }
-        for (int i = 0; i < 1; i++){
+        for (int i = 0; i < noBuses; i++){
             bus[i]->writeDataFromFile(file);
         }
+        saveSystem();
         file.close();
     }
     void readAllBusses(){
         fstream file("bus.txt",ios::in);
-        
+        cout<<"in readAllfunc";
+        loadSystem();
+        cout<<"No. Buses : "<<noBuses<<endl;
         if (!file.is_open())
         {
             cout << "Error opening file for reading." << endl;
             return;
         }
-            bus[0]->readDataFromFile(file);
+        cout<<"\nin readAllfunc before Bus main alloc";
+        bus = new Bus*[noBuses];
+        cout<<"\nin readAllfunc before read individual";
+        for(int i=0;i<noBuses;i++){
+        cout<<"\nin for loop";
+            bus[i] = new Bus();
+        cout<<"\nafter bus *";
+            bus[i]->readDataFromFile(file);
+            // bus[i];
         
-        cout<<"BusId: "<<bus[0]->getBusId()<<endl;
-        cout<<"Capacity: "<<bus[0]->getCapacity()<<endl;
-        cout<<"No of Customers: "<<bus[0]->getNoCustomersAssigned()<<endl;
+        cout<<"BusId: "<<bus[i]->getBusId()<<endl;
+        cout<<"Capacity: "<<bus[i]->getCapacity()<<endl;
+        cout<<"No of Customers: "<<bus[i]->getNoCustomersAssigned()<<endl;
         cout<<"Stops: ";
-        bus[0]->printStops();
+        bus[i]->printStops();
+        }
         cout<<endl;
         file.close();
     }
+    void saveAllCustomers(){
+        fstream studentFile("student.txt",ios::out);
+        fstream teacherFile("teacher.txt",ios::out);
+        if (!studentFile.is_open() || !teacherFile.is_open()){
+            cout << "Error opening file for writing." << endl;
+            return;
+        }
+        for (int i = 0; i < noCustomers; i++){
+            if (dynamic_cast<Student*>(customer[i])){
+                customer[i]->writeDataToFile(studentFile);
+            }
+            else if (dynamic_cast<Teacher*>(customer[i])){
+                customer[i]->writeDataToFile(teacherFile);
+            }
+        }
+        saveSystem();
+    }
+    void readAllCustomers(){
+        cout<<"in read cust.\n";
+        loadSystem();
+        cout<<"loaded system.\n";
+        fstream studentFile("student.txt",ios::in);
+        fstream teacherFile("teacher.txt",ios::in);
+        if (!studentFile.is_open() || !teacherFile.is_open()){
+            cout << "Error opening file for writing." << endl;
+            return;
+        }
+        cout<<"alloc\n";
+        customer = new Customer*[noCustomers];
+        cout<<"no Studnets"<<noStudents<<"\n no Teachers"<<noTeachers<<endl;
+        for (int i = 0; i < noStudents; i++){
+            cout<<"in student llop";
+            customer[i]= new Student();
+            cout<<"student indiv";
+            customer[i]->readDataFromFile(studentFile);
+        }
+        for (int i = noStudents; i <(noStudents+noTeachers); i++){
+            cout<<"in teacher llop";
+            customer[i]= new Teacher();
+            cout<<"teahcer indiv";
+            customer[i]->readDataFromFile(teacherFile);
+        }
+        cout<<"exiting fucntion read\n";
+        printAllCustomers();
+    }
     void addCustomer(string name, bool paid, string pickup, string drop, string Type)
     {
-        Customer **temp = new Customer *[noCustomers + 1]; // ✅ Allocate array of pointers
+        Customer **temp = new Customer *[noCustomers + 1]; 
 
         for (int i = 0; i < noCustomers; i++)
         {
-            temp[i] = customer[i]; // ✅ Copy existing pointers
+            temp[i] = customer[i]; 
         }
 
         if (Type == "student")
         {
-            temp[noCustomers] = new Student(noCustomers + 1, name, paid, pickup, drop); // ✅ Use new
+            temp[noCustomers] = new Student(noCustomers + 1, name, paid, pickup, drop);
+            noStudents++;
         }
         else if (Type == "teacher")
         {
-            temp[noCustomers] = new Teacher(noCustomers + 1, name, paid, pickup, drop); // ✅ Use new
+            temp[noCustomers] = new Teacher(noCustomers + 1, name, paid, pickup, drop);
+            noTeachers++;
         }
 
-        delete[] customer; // ✅ Free old array (but don't delete objects)
+        delete[] customer; 
         customer = temp;
         noCustomers++;
     }
@@ -573,7 +636,9 @@ int main()
         cout << "5. All Buses" << endl;
         cout << "6. Write all Busses" << endl;
         cout << "7. Read all Busses" << endl;
-        cout << "8. Exit" << endl;
+        cout << "8. Write all customers" << endl;
+        cout << "9. Read all customers" << endl;
+        cout << "10. Exit" << endl;
         choice = getValidInt();
 
         switch (choice)
@@ -647,6 +712,12 @@ int main()
             ts.readAllBusses();
             break;
         case 8:
+            ts.saveAllCustomers();
+            break;
+        case 9:
+            ts.readAllCustomers();
+            break;
+        case 10:
 
             return 0;
 
