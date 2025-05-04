@@ -19,26 +19,13 @@ public:
              << endl;
     }
 };
-void writeString(fstream &out, const string &str) {
-    size_t len = str.length();
-    out.write(reinterpret_cast<const char*>(&len), sizeof(len));     // Write string length
-    out.write(str.c_str(), len);                                     // Write string content
-}
-void readString(fstream &in, string &str) {
-    size_t len;
-    in.read(reinterpret_cast<char*>(&len), sizeof(len));             // Read string length
-    char *buffer = new char[len + 1];
-    in.read(buffer, len);                                            // Read string content
-    buffer[len] = '\0';
-    str = buffer;
-    delete[] buffer;
-}
-int getValidInt()
+
+int getValidInt(string prompt)
 {
     int value;
     while (true)
     {
-        cout << "Enter your choice: ";
+        cout << prompt;
         cin >> value;
 
         if (cin.fail())
@@ -49,8 +36,8 @@ int getValidInt()
         }
         else
         {
-            cin.ignore(1000, '\n'); // Clear any extra characters (like letters after numbers)
-            return value;           // Return valid input
+            cin.ignore(1000, '\n'); 
+            return value;           
         }
     }
 }
@@ -177,7 +164,7 @@ public:
     void setIsPaid(bool paid) override
     {
         ispaid = paid;
-        if(paid = true)
+        if(paid = (true))
         CardActiveMonths = 1;
     }
     void printDetails() override
@@ -639,7 +626,7 @@ int main()
         cout << "8. Write all customers" << endl;
         cout << "9. Read all customers" << endl;
         cout << "10. Exit" << endl;
-        choice = getValidInt();
+        choice = getValidInt("Enter Your Choice: ");
 
         switch (choice)
         {
@@ -660,14 +647,11 @@ int main()
 
         case 2:
         {
-            cout << "Enter bus ID: (integer)";
             int busId;
-            cin >> busId;
-            cout << "Enter capacity: (integer)";
-            cin >> capacity;
-            cout << "Enter number of stops: (Integer greater than 0)";
+            busId = getValidInt("Enter bus ID: (integer)");
+            capacity=getValidInt("Enter capacity: (integer)");
             int n;
-            cin >> n;
+            n=getValidInt("Enter number of stops: (Integer greater than 0)");
 
             string *stops = new string[n];
             for (int i = 0; i < n; i++)
@@ -675,7 +659,7 @@ int main()
                 cout << "Enter stop: ";
                 cin >> stops[i];
             }
-            cout << "Bus added in TS" << endl;
+           
             ts.addBus(busId, capacity, stops, n);
         }
         break;
@@ -684,19 +668,14 @@ int main()
         {
             ts.printAllBuses();
             ts.printAllCustomers();
-            cout << "Enter Customer index: ";
             int CustomerIndex;
-            cin >> CustomerIndex;
-            cout << "Enter bus index: ";
+            CustomerIndex=getValidInt("Enter Customer index: ");
             int busIndex;
-            cin >> busIndex;
+            busIndex=getValidInt("Enter bus index: ");
             Customer* custPtr = ts.getCustomer()[CustomerIndex];
-            cout<<"after custPtr\n";
             custPtr->printDetails();
-            cout<<"after custPtr\n";
 
             ts.getBus()[busIndex]->AssignCustomer(custPtr);
-            cout<<"after getBus\n";
             }
         break;
         case 4:
